@@ -601,7 +601,17 @@ app.get('/v1/models', async (req, res) => {
  * Count tokens endpoint - Anthropic Messages API compatible
  * Uses hybrid approach: local tokenizer for text, API for complex content (images, documents)
  */
-app.post('/v1/messages/count_tokens', createCountTokensHandler(accountManager));
+app.post('/v1/messages/count_tokens', async (req, res) => {
+    try {
+        // Ensure account manager is initialized for API-based counting
+        await ensureInitialized();
+    } catch (error) {
+        // If initialization fails, handler will fall back to local estimation
+        logger.debug(`[TokenCounter] Account manager not initialized: ${error.message}`);
+    }
+
+    return createCountTokensHandler(accountManager)(req, res);
+});
 
 /**
  * Main messages endpoint - Anthropic Messages API compatible
