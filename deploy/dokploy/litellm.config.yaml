@@ -1,0 +1,24 @@
+model_list:
+  - model_name: ag-sonnet
+    litellm_params:
+      model: anthropic/claude-sonnet-4-6
+      api_base: http://antigravity:8080
+      api_key: os.environ/ANTIGRAVITY_API_KEY
+
+  - model_name: ag-opus
+    litellm_params:
+      model: anthropic/claude-opus-4-6-thinking
+      api_base: http://antigravity:8080
+      api_key: os.environ/ANTIGRAVITY_API_KEY
+
+  - model_name: ag-gemini-3.1-pro-high
+    litellm_params:
+      model: anthropic/gemini-3.1-pro-high
+      api_base: http://antigravity:8080
+      api_key: os.environ/ANTIGRAVITY_API_KEY
+
+  - model_name: ag-gemini-3.1-pro-low
+    litellm_params:
+      model: anthropic/gemini-3.1-pro-low
+      api_base: http://antigravity:8080
+      api_key: os.environ/ANTIGRAVITY_API_KEY

@@ -1,0 +1,45 @@
+services:
+  antigravity:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    container_name: antigravity-proxy
+    restart: unless-stopped
+    environment:
+      HOST: 0.0.0.0
+      PORT: 8080
+      API_KEY: ${ANTIGRAVITY_API_KEY:-}
+      WEBUI_PASSWORD: ${ANTIGRAVITY_WEBUI_PASSWORD:-}
+      DEBUG: ${ANTIGRAVITY_DEBUG:-false}
+      HTTP_PROXY: ${HTTP_PROXY:-}
+      HTTPS_PROXY: ${HTTPS_PROXY:-}
+    expose:
+      - "8080"
+    volumes:
+      - antigravity_config:/root/.config/antigravity-proxy
+      - antigravity_state:/root/.antigravity-claude-proxy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8080/health >/dev/null || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+
+  litellm:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.litellm
+    container_name: litellm-bridge
+    restart: unless-stopped
+    environment:
+      LITELLM_MASTER_KEY: ${LITELLM_MASTER_KEY}
+      ANTIGRAVITY_API_KEY: ${ANTIGRAVITY_API_KEY:-test}
+    depends_on:
+      antigravity:
+        condition: service_healthy
+    ports:
+      - "${LITELLM_PORT:-4000}:4000"
+
+volumes:
+  antigravity_config:
+  antigravity_state:

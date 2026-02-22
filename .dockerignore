@@ -1,0 +1,8 @@
+.git
+.gitignore
+node_modules
+.venv-cursor-bridge
+deploy/dokploy/.env
+npm-debug.log
+*.log
+.DS_Store

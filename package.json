@@ -36,7 +36,9 @@
     "test:emptyretry": "node tests/test-empty-response-retry.cjs",
     "test:sanitizer": "node tests/test-schema-sanitizer.cjs",
     "test:strategies": "node tests/test-strategies.cjs",
-    "test:cache-control": "node tests/test-cache-control.cjs"
+    "test:cache-control": "node tests/test-cache-control.cjs",
+    "cursor:bridge": "bash ./scripts/run-cursor-bridge.sh",
+    "cursor:bridge:check": "bash ./scripts/check-cursor-bridge.sh"
   },
   "keywords": [
     "claude",
