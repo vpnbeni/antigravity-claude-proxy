@@ -7,9 +7,26 @@ LITELLM_PORT="${LITELLM_PORT:-4000}"
 LITELLM_CONFIG="${LITELLM_CONFIG:-$ROOT_DIR/scripts/cursor-bridge-litellm.yaml}"
 LITELLM_VENV="${LITELLM_VENV:-$ROOT_DIR/.venv-cursor-bridge}"
 
-if [[ ! -x "$LITELLM_VENV/bin/litellm" ]]; then
+# Detect platform: Windows venvs use Scripts/, Unix uses bin/
+if [[ -d "$LITELLM_VENV/Scripts" ]]; then
+  VENV_BIN="$LITELLM_VENV/Scripts"
+  ACTIVATE_CMD=". .venv-cursor-bridge/Scripts/activate"
+else
+  VENV_BIN="$LITELLM_VENV/bin"
+  ACTIVATE_CMD=". .venv-cursor-bridge/bin/activate"
+fi
+
+# Find litellm executable (litellm or litellm.exe on Windows)
+LITELLM_BIN=""
+if [[ -x "$VENV_BIN/litellm" ]]; then
+  LITELLM_BIN="$VENV_BIN/litellm"
+elif [[ -f "$VENV_BIN/litellm.exe" ]]; then
+  LITELLM_BIN="$VENV_BIN/litellm.exe"
+fi
+
+if [[ -z "$LITELLM_BIN" ]]; then
   echo "LiteLLM not found in $LITELLM_VENV."
-  echo "Run: python3 -m venv .venv-cursor-bridge && . .venv-cursor-bridge/bin/activate && pip install \"litellm[proxy]\" hypercorn"
+  echo "Run: python3 -m venv .venv-cursor-bridge && $ACTIVATE_CMD && pip install \"litellm[proxy]\" hypercorn"
   exit 1
 fi
 
@@ -38,7 +55,7 @@ HOST=127.0.0.1 PORT="$AG_PORT" npm start &
 AG_PID=$!
 
 echo "[cursor-bridge] starting litellm bridge on :$LITELLM_PORT"
-"$LITELLM_VENV/bin/litellm" --host 127.0.0.1 --config "$LITELLM_CONFIG" --port "$LITELLM_PORT" --run_hypercorn --drop_params &
+"$LITELLM_BIN" --host 127.0.0.1 --config "$LITELLM_CONFIG" --port "$LITELLM_PORT" --run_hypercorn --drop_params &
 LLM_PID=$!
 
 echo "[cursor-bridge] running"
